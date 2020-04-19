@@ -11,11 +11,11 @@ Class DatumCollectorMap : OrderedDictionary {
         $CollectorMapDefinition.Keys.ForEach{
             # Dispatch the content of that key, using [DatumCollectorMap] if ApiVersion, Kind, Specs not specified
             Write-Debug "Adding Key $_"
-            if (!$CollectorMapDefinition[$_].Contains('Name')) {
-                $CollectorMapDefinition[$_].Add('Name', $_)
+            if (!$CollectorMapDefinition.($_).Contains('Name')) {
+                $CollectorMapDefinition.($_).Add('Name', $_)
             }
             
-            $this.add($_,[ApiDispatcher]::DispatchSpec('DatumCollector',$CollectorMapDefinition[$_]))
+            $this.add($_,[ApiDispatcher]::DispatchSpec('DatumCollector',$CollectorMapDefinition.($_)))
             # $this.add($_,$CollectorMapDefinition[$_])
         }
         # foreach key

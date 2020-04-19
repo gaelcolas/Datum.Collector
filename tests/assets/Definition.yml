@@ -1,5 +1,5 @@
 apiVersion: v0
-kind: Datum.Collector::DatumCollectorMap
+kind: Datum.Collector\DatumCollectorMap
 spec:
   ComputerInfo1:
     Description: |

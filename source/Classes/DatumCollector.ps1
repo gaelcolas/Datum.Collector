@@ -28,6 +28,7 @@ class DatumCollector {
                                 $DatumCollectorDefinition.RunAs
                             }
                             else {
+                                Write-Debug "Sending 'RunAs' to API Dispatcher"
                                 [ApiDispatcher]::DispatchSpec('DatumHandler',$DatumCollectorDefinition.RunAs)
                             }
                             

@@ -1,0 +1,36 @@
+apiVersion: v0
+kind: Datum.Collector\DatumCollectorMap
+spec:
+  ComputerInfo1:
+    Description: |
+      A nice little Datum collector that would get a wmi class and return properties.
+      Parameters are not mandatory as they could be hardcoded, but good example for when you get from
+      other system via Datum handler or similar.
+    DatumCollector:
+      ScriptBlock: |
+        {
+          param(
+            $wmi_class,
+            $Property
+          )
+          gwmi win32_ComputerSystem | Select domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory
+        }
+    When: |
+      {
+        !$isLinux -and !$isMacOS
+      }
+    otherWise: N/A
+    RunAs: #'[Secret=GoGetSecret]'
+      apiVersion: v0
+      kind: ClearTextCredential::GetCredential()
+      Spec:
+        username: MyUserName
+        password: P@ssw0rd
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
+    RefreshSchedule:
+      StartTime: '13:00:00'
+      MinimumInterval: '60:00'
+    Metadata:
+      Tags: [Tag1, Tag2, Tag3]
