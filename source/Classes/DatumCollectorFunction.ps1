@@ -1,6 +1,4 @@
-using namespace System.Management.Automation
-
 class DatumCollectorFunction : DatumCollectorProvider {
-    [CommandInfo] $Command
+    [System.Management.Automation.CommandInfo] $Command
 
 }

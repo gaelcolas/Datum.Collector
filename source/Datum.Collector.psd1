@@ -54,7 +54,11 @@ Description = 'Gather data and cache them serialized.'
 # RequiredModules = @()
 
 # Assemblies that must be loaded prior to importing this module
-# RequiredAssemblies = @()
+RequiredAssemblies = @(
+    'System.Management.Automation',
+    'System.Collections',
+    'System.Collections.Specialized'
+    )
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()

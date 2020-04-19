@@ -1,8 +1,6 @@
-using namespace Microsoft.PowerShell.Commands
-
 class DatumCollectorProvider {
 
-    [ModuleSpecification] $Module
+    [Microsoft.PowerShell.Commands.ModuleSpecification] $Module
 
     [void] Collect()
     {

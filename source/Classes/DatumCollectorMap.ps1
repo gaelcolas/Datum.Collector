@@ -1,5 +1,5 @@
 using namespace System.Collections.Specialized
-using namespace YamlDotNet.Serialization
+# using namespace YamlDotNet.Serialization
 
 Class DatumCollectorMap : OrderedDictionary {
 
