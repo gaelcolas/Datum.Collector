@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v0
 kind: Datum.Collector::DatumCollectorMap
 spec:
   ComputerInfo1:
@@ -20,7 +20,12 @@ spec:
         !$isLinux -and !$isMacOS
       }
     otherWise: N/A
-    RunAs: '[Secret=GoGetSecret]'
+    RunAs: #'[Secret=GoGetSecret]'
+      apiVersion: v0
+      kind: ClearTextCredential::GetCredential()
+      Spec:
+        username: MyUserName
+        password: P@ssw0rd
     Parameters:
       wmi_class: win32_ComputerSystem
       Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
@@ -32,7 +37,7 @@ spec:
 
 ---
 
-apiVersion: v1
+apiVersion: v0
 kind: DatumCollectorMap
 spec:
   ComputerInfo2:
@@ -52,7 +57,7 @@ spec:
 
 ---
 
-apiVersion: v1
+apiVersion: v0
 kind: DatumCollectorMap
 spec:
   ComputerInfo3:
@@ -73,7 +78,7 @@ spec:
       
 ---
 
-apiVersion: v1
+apiVersion: v0
 kind: DatumCollectorMap
 spec:
   ComputerInfo4:

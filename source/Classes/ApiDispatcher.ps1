@@ -22,8 +22,8 @@ class ApiDispatcher {
     }
     
     static [Object] DispatchSpec([type] $DefaultType, [IDictionary] $Definition) {
-
-        if (!$Definition.keys.Contains('kind')) {
+        if (!$Definition.Contains('kind')) {
+            Write-Debug "Dispatching specs as $DefaultType."
             return [ApiDispatcher]::DispatchSpec(
                 [ordered]@{
                     kind = $DefaultType
@@ -32,30 +32,54 @@ class ApiDispatcher {
             )
         }
         else {
+            Write-Debug "Specs defines kind, dispatching."
             return [ApiDispatcher]::DispatchSpec($Definition)
         }
     }
 
     static [Object] DispatchSpec([IDictionary] $Definition) {
-        
+        $moduleString = ''
+        $returnCode = ''
+
         if ($Definition.Kind -match '::') {
             $moduleName, $className = $Definition.Kind.Split('::', 2)
+            if ($className -match '::') {
+                $className, $StaticMethod = $className.Split('::', 2)
+                $StaticMethod.Trim('()')
+                Write-Debug -Message "Calling static method '$StaticMethod' from $className."
+                $returnCode = "return [$className]::$StaticMethod(`$args[0])"
+            }
+            else {
+                $returnCode = "return [$className]::new(`$args[0])"
+            }
+            Write-Debug "Module is '$moduleName', Class is '$className'."
             $moduleString = "using module $moduleName"
+        }
+        elseif ($Definition.Kind -match '\-') {
+            if ($Definition.Kind -match '\\') {
+                $moduleName, $functionName = $Definition.kind.Split('\\', 2)
+                $moduleString = "Import-Module $moduleName"
+            }
+            else {
+                $functionName = $Definition.Kind
+            }
+            Write-Debug -Message "Calling funcion $functionName"
+            $returnCode = "`$params = `$Args[0]`r`n ,($functionName @params)"
         }
         else {
             $className = $Definition.Kind
-            $moduleString = $null
+            $returnCode = "return [$className]::new(`$args[0])"
+            Write-Debug "Class is [$className]."
         }
 
         $specObject = $Definition.Spec
         
         $script = @"
 $moduleString
-
-return [$ClassName]::new(`$args[0])
+$returnCode
 "@
-        
-        return [scriptblock]::Create($script).Invoke($specObject)
+        Write-Debug "ScriptBlock = `r`n$script`r`n"
+        return [scriptblock]::Create($script).Invoke($specObject)[0]
     }
 }
 

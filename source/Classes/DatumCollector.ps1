@@ -18,5 +18,19 @@ class DatumCollector {
     DatumCollector([OrderedDictionary] $DatumCollectorDefinition) {
         $this.Name = $DatumCollectorDefinition.Name
         $this.Description = $DatumCollectorDefinition.Description
+        $this.When = [scriptblock]::Create($DatumCollectorDefinition.When)
+        $this.RunAs = if ($null -eq $DatumCollectorDefinition.RunAs) 
+                            {
+                                $null
+                            }
+                            elseif ($DatumCollectorDefinition.RunAs -is [pscredential])
+                            {
+                                $DatumCollectorDefinition.RunAs
+                            }
+                            else {
+                                [ApiDispatcher]::DispatchSpec('DatumHandler',$DatumCollectorDefinition.RunAs)
+                            }
+                            
+        
     }
 }
