@@ -1,0 +1,4 @@
+Enum DscResourceCollectorMethod {
+    Get
+    Set
+}

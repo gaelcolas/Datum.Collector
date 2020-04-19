@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Datum.Collector::DatumCollectorMap
+spec:
+  ComputerInfo1:
+    Description: |
+      A nice little Datum collector that would get a wmi class and return properties.
+      Parameters are not mandatory as they could be hardcoded, but good example for when you get from
+      other system via Datum handler or similar.
+    DatumCollector:
+      ScriptBlock: |
+        {
+          param(
+            $wmi_class,
+            $Property
+          )
+          gwmi win32_ComputerSystem | Select domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory
+        }
+    When: |
+      {
+        !$isLinux -and !$isMacOS
+      }
+    otherWise: N/A
+    RunAs: '[Secret=GoGetSecret]'
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
+    RefreshSchedule:
+      StartTime: '13:00:00'
+      MinimumInterval: '60:00'
+    Metadata:
+      Tags: [Tag1, Tag2, Tag3]
+
+---
+
+apiVersion: v1
+kind: DatumCollectorMap
+spec:
+  ComputerInfo2:
+    Description: Collecting data from a module
+    DatumCollector:
+      ModuleName: Datum.Collector
+      # ModuleVersion: 0.0.1
+      CollectorName: wmi
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
+    RefreshSchedule:
+      StartTime: '13:00:00'
+      MinimumInterval: '60:00'
+    Metadata:
+      Tags: [Tag1, Tag2, Tag3]
+
+---
+
+apiVersion: v1
+kind: DatumCollectorMap
+spec:
+  ComputerInfo3:
+    Description: Collecting data from a DSC Resource
+    DatumCollector:
+      ModuleName: Datum.Collector
+      CollectorName: DscResource
+      ResourceName: MyDscResource
+      Method: Get # or Test (set not valid)
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
+    RefreshSchedule:
+      StartTime: '13:00:00'
+      MinimumInterval: '60:00'
+    Metadata:
+      Tags: [Tag1, Tag2, Tag3]
+      
+---
+
+apiVersion: v1
+kind: DatumCollectorMap
+spec:
+  ComputerInfo4:
+    Description: Collecting data from a Module's Function
+    DatumCollector:
+      ModuleName: Datum.Collector
+      CollectorName: Function
+      FunctionName: Get-SomeData
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
+    RefreshSchedule:
+      StartTime: '13:00:00'
+      MinimumInterval: '60:00'
+    Metadata:
+      Tags: [Tag1, Tag2, Tag3]
+      
