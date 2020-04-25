@@ -15,6 +15,9 @@ spec:
           )
           gwmi win32_ComputerSystem | Select domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory
         }
+      Parameters:
+        wmi_class: win32_ComputerSystem
+        Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
     When: |
       {
         !$isLinux -and !$isMacOS
@@ -26,9 +29,6 @@ spec:
       Spec:
         username: MyUserName
         password: P@ssw0rd
-    Parameters:
-      wmi_class: win32_ComputerSystem
-      Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
     RefreshSchedule:
       StartTime: '13:00:00'
       MinimumInterval: '60:00'

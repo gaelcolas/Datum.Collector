@@ -1,0 +1,5 @@
+apiVersion: v0
+kind: Schedule
+spec:
+  StartTime: '13:00:00'
+  MinimumInterval: '60:00'

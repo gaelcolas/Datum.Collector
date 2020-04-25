@@ -32,7 +32,7 @@ class ApiDispatcher {
             )
         }
         else {
-            Write-Debug "Specs defines kind, dispatching."
+            Write-Debug "Definition defines kind, dispatching."
             return [ApiDispatcher]::DispatchSpec($Definition)
         }
     }

@@ -10,11 +10,13 @@ spec:
     ScriptBlock: |
       {
         param(
-          $wmi_class,
-          $Property
+          $Parameters
         )
-        gwmi win32_ComputerSystem | Select domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory
+        Get-CimInstance -ClassName $Parameters.wmi_class | Select-Object -Property $Parameters.Property
       }
+    Parameters:
+      wmi_class: win32_ComputerSystem
+      Property: [domain, Manufacturer, Model, Name, TotalPhysicalMemory]
   When: |
     {
       !$isLinux -and !$isMacOS
@@ -26,9 +28,6 @@ spec:
     spec:
       username: MyUserName
       password: P@ssw0rd
-  Parameters:
-    wmi_class: win32_ComputerSystem
-    Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
   RefreshSchedule:
     StartTime: '13:00:00'
     MinimumInterval: '60:00'

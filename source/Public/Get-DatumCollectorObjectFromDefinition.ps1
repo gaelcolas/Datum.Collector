@@ -10,7 +10,10 @@ function Get-DatumCollectorObjectFromDefinition {
         [Parameter(ParameterSetName = 'ByDictionary', Mandatory, ValueFromPipelineByPropertyName)]
         [ValidateNotNullOrEmpty()]
         [System.Collections.IDictionary[]]
-        $Definition
+        $Definition,
+
+        [string]
+        $DefaultType
     )
     
     begin {
@@ -33,7 +36,12 @@ function Get-DatumCollectorObjectFromDefinition {
     
     process {
         foreach ($objectDefinition in $Definition) {
-            [ApiDispatcher]::DispatchSpec($objectDefinition)
+            if ($DefaultType) {
+                [ApiDispatcher]::DispatchSpec($DefaultType, $objectDefinition)
+            }
+            else {
+                [ApiDispatcher]::DispatchSpec($objectDefinition)
+            }
         }
     }
     
