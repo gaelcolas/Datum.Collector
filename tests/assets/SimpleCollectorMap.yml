@@ -10,13 +10,12 @@ spec:
       ScriptBlock: |
         {
           param(
-            $wmi_class,
-            $Property
+            $Params
           )
-          gwmi win32_ComputerSystem | Select domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory
+          Get-CimInstance -ClassName $Params.ClassName | Select $Params.Property
         }
       Parameters:
-        wmi_class: win32_ComputerSystem
+        ClassName: win32_ComputerSystem
         Property: [domain, Manufacturer, Model, Name, PrimaryOwnerName, TotalPhysicalMemory]
     When: |
       {

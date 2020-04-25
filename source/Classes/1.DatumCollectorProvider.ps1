@@ -23,6 +23,9 @@ class DatumCollectorProvider {
                 }
             }
         }
+        else {
+            Write-Debug "There are no Paramaters for this Collector"
+        }
     }
 
     hidden [void] Set_ModuleFromDefinition($DatumCollectorProviderDefinition) {

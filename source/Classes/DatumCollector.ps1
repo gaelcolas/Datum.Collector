@@ -52,7 +52,7 @@ class DatumCollector {
             $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorScriptBlock',$DatumCollectorDefinition.DatumCollector)
         }
         elseif ($DatumCollectorDefinition.DatumCollector.keys -contains 'Command') {
-            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorFunction',$DatumCollectorDefinition.DatumCollector)
+            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorCommand',$DatumCollectorDefinition.DatumCollector)
         }
         elseif ($DatumCollectorDefinition.DatumCollector.keys -contains 'DscResourceName') {
             $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorDscResource',$DatumCollectorDefinition.DatumCollector)
@@ -63,6 +63,6 @@ class DatumCollector {
     }
 
     [object] Collect() {
-        $this.DatumCollector.Collect()
+        return $this.DatumCollector.Collect()
     }
 }
