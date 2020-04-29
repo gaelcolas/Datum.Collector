@@ -63,6 +63,7 @@ class DatumCollector {
     }
 
     [object] Collect() {
+        # TODO #1: Evaluate the When first, and run Collect or return Otherwise || $null
         return $this.DatumCollector.Collect()
     }
 }

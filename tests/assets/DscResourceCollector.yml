@@ -1,0 +1,22 @@
+apiVersion: v0
+kind: Datum.Collector\DatumCollector
+spec:
+  Name: MyCollector
+  Description: Collecting data from a DSC Resource
+  DatumCollector:
+    CollectorName: DscResource
+    Module: PSDesiredStateCongiguration # Module set by DatumCollectorProvider 
+    ResourceName: Script # aka Name
+    Method: Get # or Test (set not valid) # aka DscResourceCollectorMethod
+    ModuleName: PSDesiredStateCongiguration
+    Parameters:
+      GetScript: $a =(Get-CimInstance -ClassName win32_ComputerSystem);@{domain=$a.domain;Manufacturer=$a.Manufacturer;Name=$a.Name;Model=$a.Model}
+      SetScript: $false
+      TestScript: $false
+  RefreshSchedule:
+    StartTime: '13:00:00'
+    MinimumInterval: '60:00'
+  Metadata:
+    Tags: [Tag1, Tag2, Tag3]
+
+# Invoke-DscResource -Name Script -ModuleName PSDesiredStateConfiguration -Method Get -Property @{GetScript='$a =(Get-CimInstance -ClassName win32_ComputerSystem);@{domain=$a.domain;Manufacturer=$a.Manufacturer;Name=$a.Name;Model=$a.Model}'; TestScript='$false'; Setscript='$false'} -Verbose

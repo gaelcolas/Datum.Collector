@@ -1,5 +1,7 @@
 class DatumCollectorDscResource : DatumCollectorProvider {
     [string]                     $DscResourceName
+    [string]                     $Verbose
+    
     [DscResourceCollectorMethod] $DscResourceCollectorMethod = [DscResourceCollectorMethod]::Get
 
     DatumCollectorDscResource ($DatumCollectorDscResourceDefinition) {
@@ -8,9 +10,13 @@ class DatumCollectorDscResource : DatumCollectorProvider {
         $this.DscResourceName = $DatumCollectorDscResourceDefinition.ResourceName
     }
 
+    # Get the DSC Resource specified
+    # Find out whether the Resource has a Sub-type(s)
+    # If there's a subtype, create CimInstance(s) for it based on Parameter
+
     [Object] Collect() {
-        return @{}
         #Invoke-DscResource -name -Method -Verbose -ModuleName -Property
+        return @{}
     }
 
     [Object] Collect([System.Collections.IDictionary] $Parameters) {
