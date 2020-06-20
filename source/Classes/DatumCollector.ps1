@@ -1,25 +1,26 @@
 using namespace System.Collections.Specialized
 
 class DatumCollector {
-    [string]                    $Name
-    [string]                    $Description
-    [ScriptBlock]               $When
-    [DatumCollectorProvider]    $DatumCollector
-    [string]                    $Otherwise
-    [PSCredential]              $RunAs
-    [OrderedDictionary]         $Parameters
-    [Schedule]                  $RefreshSchedule
-    [OrderedDictionary]         $Metadata
+    [string]                    hidden $__Name
+    [string]                    hidden $__Description
+    [ScriptBlock]               hidden $__When
+    [DatumCollectorProvider]    hidden $__DatumCollector
+    [string]                    hidden $__Otherwise
+    [PSCredential]              hidden $__RunAs
+    [OrderedDictionary]         hidden $__Parameters
+    [RefreshSchedule]           hidden $__RefreshSchedule
+    [OrderedDictionary]         hidden $__Metadata
+    [Nullable[DateTime]]        hidden $__LastCollected
 
     DatumCollector() {
         
     }
 
     DatumCollector([OrderedDictionary] $DatumCollectorDefinition) {
-        $this.Name = $DatumCollectorDefinition.Name
-        $this.Description = $DatumCollectorDefinition.Description
-        $this.When = [scriptblock]::Create($DatumCollectorDefinition.When)
-        $this.RunAs = if ($null -eq $DatumCollectorDefinition.RunAs)
+        $this.__Name = $DatumCollectorDefinition.Name
+        $this.__Description = $DatumCollectorDefinition.Description
+        $this.__When = [scriptblock]::Create($DatumCollectorDefinition.When)
+        $this.__RunAs = if ($null -eq $DatumCollectorDefinition.RunAs)
                             {
                                 $null
                             }
@@ -32,38 +33,61 @@ class DatumCollector {
                                 [ApiDispatcher]::DispatchSpec('DatumHandler',$DatumCollectorDefinition.RunAs)
                             }
                             
-        $this.Otherwise = $DatumCollectorDefinition.Otherwise
-        $this.RefreshSchedule = if ($null -eq $DatumCollectorDefinition.RefreshSchedule) 
+        $this.__Otherwise = $DatumCollectorDefinition.Otherwise
+        $this.__RefreshSchedule = if ($null -eq $DatumCollectorDefinition.RefreshSchedule) 
                             {
                                 $null
                             }
-                            elseif ($DatumCollectorDefinition.RefreshSchedule -is [Schedule])
+                            elseif ($DatumCollectorDefinition.RefreshSchedule -is [RefreshSchedule])
                             {
                                 $DatumCollectorDefinition.RefreshSchedule
                             }
                             else {
                                 Write-Debug "Sending 'RefreshSchedule' to API Dispatcher"
-                                [ApiDispatcher]::DispatchSpec('Schedule', $DatumCollectorDefinition.RefreshSchedule)
+                                [ApiDispatcher]::DispatchSpec('RefreshSchedule', $DatumCollectorDefinition.RefreshSchedule)
                             }
                             
-        $this.Metadata = $DatumCollectorDefinition.Metadata
+        $this.__Metadata = $DatumCollectorDefinition.Metadata
 
         if ($DatumCollectorDefinition.DatumCollector.keys -contains 'scriptblock') {
-            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorScriptBlock',$DatumCollectorDefinition.DatumCollector)
+            $this.__DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorScriptBlock',$DatumCollectorDefinition.DatumCollector)
         }
         elseif ($DatumCollectorDefinition.DatumCollector.keys -contains 'Command') {
-            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorCommand',$DatumCollectorDefinition.DatumCollector)
+            $this.__DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorCommand',$DatumCollectorDefinition.DatumCollector)
         }
         elseif ($DatumCollectorDefinition.DatumCollector.keys -contains 'DscResourceName') {
-            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorDscResource',$DatumCollectorDefinition.DatumCollector)
+            $this.__DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorDscResource',$DatumCollectorDefinition.DatumCollector)
         }
         else {
-            $this.DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorProvider',$DatumCollectorDefinition.DatumCollector)
+            $this.__DatumCollector = [ApiDispatcher]::DispatchSpec('DatumCollectorProvider',$DatumCollectorDefinition.DatumCollector)
         }
     }
 
     [object] Collect() {
         # TODO #1: Evaluate the When first, and run Collect or return Otherwise || $null
-        return $this.DatumCollector.Collect()
+        $result = $this.__DatumCollector.Collect()
+        $this.SetResultProperties($result)
+        return $result
+    }
+
+    [object] GetValue() {
+        if (-not $this.__LastCollected) {
+            $null = $this.Collect()
+            $this.__LastCollected = [datetime]::Now
+        }
+
+        return $this
+    }
+
+    
+    hidden [void] SetResultProperties($Result) {
+        $Result.PSObject.Properties | ForEach-Object {
+            try {
+                $this | Add-Member -MemberType NoteProperty -Value $_.Value -Name $_.Name -Force
+            }
+            catch {
+                Throw "Error trying to update property $($_.Name) of current Object"
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 # Datum.Collector
 
-> NOTE: This is a Work in Progress and documents the Intent as of time of writin not necessarily what is or will be implemented!
+> NOTE: This is a Work in Progress and documents the Intent as of time of writing not necessarily what is or will be implemented!
 
 Gather data and cache them serialized in a structure.
 

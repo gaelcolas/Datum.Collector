@@ -66,7 +66,7 @@ class ApiDispatcher {
         elseif ($Action -match '::') {
             # Static Method
             $className, $StaticMethod = $Action.Split('::', 2)
-            $StaticMethod = $StaticMethod.Trim('\(\)')
+            $StaticMethod = $StaticMethod.Trim('\(\):')
             Write-Debug -Message "Calling static method '[$className]::$StaticMethod(`$spec)'"
             $returnCode = "return [$className]::$StaticMethod(`$args[0])"
         }

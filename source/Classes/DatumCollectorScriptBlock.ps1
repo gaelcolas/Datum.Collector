@@ -1,7 +1,7 @@
 using namespace System.Collections.Specialized
 class DatumCollectorScriptblock : DatumCollectorProvider {
-    [scriptblock] $ScriptBlock
-    [System.Collections.IDictionary] $Parameters
+    [scriptblock] hidden $ScriptBlock
+    [System.Collections.IDictionary] hidden $Parameters
 
     DatumCollectorScriptblock ([orderedDictionary] $DatumCollectorScriptblockDefinition) {
         $scriptblockDefinition = $DatumCollectorScriptblockDefinition.scriptblock.Trim()
@@ -20,6 +20,7 @@ class DatumCollectorScriptblock : DatumCollectorProvider {
         else {
             $result = $this.ScriptBlock.Invoke()[0]
         }
+
         return $result
     }
 
@@ -27,15 +28,15 @@ class DatumCollectorScriptblock : DatumCollectorProvider {
         if ($this.Module) {
             Import-Module -FullyQualifiedName $this.Module
         }
-        $result = $this.ScriptBlock.Invoke($Parameters)[0]
-        return $result
+
+        return $this.ScriptBlock.Invoke($Parameters)[0]
     }
 
     [Object] Collect([System.Collections.IEnumerable] $Parameter) {
         if ($this.Module) {
             Import-Module -FullyQualifiedName $this.Module
         }
-        $result = $this.ScriptBlock.Invoke($Parameter)[0]
-        return $result
+        
+        return $this.ScriptBlock.Invoke($Parameter)[0]
     }
 }

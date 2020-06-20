@@ -1,7 +1,9 @@
 using namespace System.Collections.Specialized
 # using namespace YamlDotNet.Serialization
 
-Class DatumCollectorMap : OrderedDictionary {
+Class DatumCollectorMap {
+
+    [OrderedDictionary] hidden $__InternalStore = [ordered]@{}
 
     DatumCollectorMap (
         [OrderedDictionary]$CollectorMapDefinition
@@ -9,20 +11,20 @@ Class DatumCollectorMap : OrderedDictionary {
     {
         # From the current DatumCollector Path
         $CollectorMapDefinition.Keys.ForEach{
-            # Dispatch the content of that key, using [DatumCollectorMap] if ApiVersion, Kind, Specs not specified
             Write-Debug "Adding Key $_"
-            if (!$CollectorMapDefinition.($_).Contains('Name')) {
-                $CollectorMapDefinition.($_).Add('Name', $_)
-            }
-            
-            $this.add($_,[ApiDispatcher]::DispatchSpec('DatumCollector',$CollectorMapDefinition.($_)))
-            # $this.add($_,$CollectorMapDefinition[$_])
+            $this.SetMapProperty($_, $CollectorMapDefinition.($_))
         }
-        # foreach key
-        # Create a new collector instance
-        # add it to a sub property
     }
-    # in constructor $this.SetReadOnlyProperty('prop',{$this.psobject.BaseObject.get_prop()})
+
+    hidden [void] SetMapProperty($Name, $Definition) {
+        if ($this.__InternalStore.Contains($Name)) {
+            $this.__InternalStore.Remove($Name)
+        }
+        Write-Debug "Setting Map Propety Name: $Name"
+        $this.__InternalStore.add($Name,[ApiDispatcher]::DispatchSpec('DatumCollector',$Definition))
+        # Internal store keeps the DatumCollector instance, the Script property calls the GetValue method
+        $this.SetReadOnlyProperty($Name, [scriptblock]::Create("`$this.__InternalStore.('$Name').GetValue()"))
+    }
 
     [void] hidden SetReadOnlyProperty($Name, $Getter) 
     {
